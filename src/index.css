@@ -1,0 +1,52 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --cream: #f5f0e8;
+  --green-deep: #1a3d2b;
+  --green-mid: #2d6a4f;
+  --green-light: #52b788;
+  --green-pale: #d8f3dc;
+  --gold: #c9a84c;
+  --gold-light: #f0d98c;
+  --terra: #8b4513;
+  --text-dark: #1a1a1a;
+  --text-mid: #4a4a4a;
+  --text-light: #888;
+  --white: #ffffff;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.16);
+  --radius: 12px;
+  --radius-lg: 20px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text-dark);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
