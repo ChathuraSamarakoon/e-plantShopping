@@ -27,58 +27,28 @@ function CheckoutModal({ onClose }) {
   );
 }
 
-function CartItemRow({ item }) {
+const CartItem = ({ onHomeClick, onPlantsClick, onCartClick }) => {
   const dispatch = useDispatch();
-
-  const handleIncrease = () => {
-    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
-  };
-
-  const handleDecrease = () => {
-    dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
-  };
-
-  const handleDelete = () => {
-    dispatch(removeItem(item.id));
-  };
-
-  return (
-    <div className="cart-item-card">
-      <img className="cart-item-img" src={item.image} alt={item.name} />
-
-      <div className="cart-item-details">
-        <h3 className="cart-item-name">{item.name}</h3>
-        <p className="cart-item-unit-price">Unit price: ${item.price.toFixed(2)}</p>
-        <p className="cart-item-subtotal">
-          Subtotal: ${(item.price * item.quantity).toFixed(2)}
-        </p>
-      </div>
-
-      <div className="cart-item-controls">
-        <div className="quantity-controls">
-          <button className="qty-btn" onClick={handleDecrease} aria-label="Decrease quantity">−</button>
-          <span className="qty-display">{item.quantity}</span>
-          <button className="qty-btn" onClick={handleIncrease} aria-label="Increase quantity">+</button>
-        </div>
-        <button className="delete-btn" onClick={handleDelete} aria-label={`Remove ${item.name}`}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-            <path d="M10 11v6M14 11v6"/>
-            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-          </svg>
-          Remove
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function CartItem({ onHomeClick, onPlantsClick, onCartClick }) {
-  const items = useSelector(selectCartItems);
+  const cart = useSelector(selectCartItems);
   const totalQuantity = useSelector(selectCartTotalQuantity);
   const totalCost = useSelector(selectCartTotalCost);
   const [showModal, setShowModal] = useState(false);
+
+  const handleIncrement = (item) => {
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+  };
+
+  const handleDecrement = (item) => {
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
+  };
+
+  const handleRemove = (item) => {
+    dispatch(removeItem(item.id));
+  };
+
+  const calculateTotalCost = (item) => {
+    return (item.price * item.quantity).toFixed(2);
+  };
 
   return (
     <div className="cart-page">
@@ -94,65 +64,113 @@ function CartItem({ onHomeClick, onPlantsClick, onCartClick }) {
       </div>
 
       <div className="cart-content">
-        {items.length === 0 ? (
+        {cart.length === 0 ? (
           <div className="cart-empty">
             <div className="empty-icon">🛒</div>
             <h2>Your cart is empty</h2>
             <p>Add some plants to get started on your paradise!</p>
-            <button className="get-started-btn" onClick={onPlantsClick} style={{ display: 'inline-flex', gap: '10px', border: 'none' }}>
-              Browse Plants
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
+            <button
+              className="get-started-btn"
+              onClick={onPlantsClick}
+              style={{ display: 'inline-flex', gap: '10px', border: 'none' }}
+            >
+              Continue Shopping
             </button>
           </div>
         ) : (
           <div className="cart-layout">
+
+            {/* Cart Items */}
             <div className="cart-items-section">
               <div className="cart-items-header">
                 <h2>Selected Plants</h2>
-                <span className="items-count-tag">{items.length} type{items.length !== 1 ? 's' : ''}</span>
+                <span className="items-count-tag">
+                  Total Plants: {totalQuantity}
+                </span>
               </div>
-              {items.map(item => (
-                <CartItemRow key={item.id} item={item} />
+
+              {cart.map(item => (
+                <div key={item.id} className="cart-item-card">
+                  <img
+                    className="cart-item-img"
+                    src={item.image}
+                    alt={item.name}
+                  />
+
+                  <div className="cart-item-details">
+                    <h3 className="cart-item-name">{item.name}</h3>
+                    <p className="cart-item-unit-price">
+                      Unit Price: ${item.price.toFixed(2)}
+                    </p>
+                    <p className="cart-item-subtotal">
+                      Total: ${calculateTotalCost(item)}
+                    </p>
+                  </div>
+
+                  <div className="cart-item-controls">
+                    <div className="quantity-controls">
+                      <button
+                        className="qty-btn"
+                        onClick={() => handleDecrement(item)}
+                      >
+                        -
+                      </button>
+                      <span className="qty-display">{item.quantity}</span>
+                      <button
+                        className="qty-btn"
+                        onClick={() => handleIncrement(item)}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleRemove(item)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
 
+            {/* Order Summary */}
             <aside className="cart-summary">
               <h3>Order Summary</h3>
 
               <div className="total-plants-badge">
                 <span className="number">{totalQuantity}</span>
-                <div className="label">
-                  Total<br />Plant{totalQuantity !== 1 ? 's' : ''}
-                </div>
+                <div className="label">Total Plants in Cart</div>
               </div>
 
-              {items.map(item => (
+              {cart.map(item => (
                 <div key={item.id} className="summary-row">
                   <span>{item.name} × {item.quantity}</span>
-                  <span className="amount">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="amount">${calculateTotalCost(item)}</span>
                 </div>
               ))}
 
-              <div className="summary-row">
-                <span>Shipping</span>
-                <span className="amount" style={{ color: 'var(--green-mid)' }}>Free 🌿</span>
-              </div>
-
               <div className="summary-row total">
-                <span>Total</span>
+                <span>Total Amount</span>
                 <span className="amount">${totalCost.toFixed(2)}</span>
               </div>
 
-              <button className="checkout-btn" onClick={() => setShowModal(true)}>
-                Proceed to Checkout
+              <button
+                className="checkout-btn"
+                onClick={() => setShowModal(true)}
+              >
+                Checkout
               </button>
 
-              <button className="continue-btn" onClick={onPlantsClick}>
-                ← Continue Shopping
+              <button
+                className="continue-btn"
+                onClick={onPlantsClick}
+              >
+                Continue Shopping
               </button>
             </aside>
+
           </div>
         )}
       </div>
@@ -160,6 +178,6 @@ function CartItem({ onHomeClick, onPlantsClick, onCartClick }) {
       {showModal && <CheckoutModal onClose={() => setShowModal(false)} />}
     </div>
   );
-}
+};
 
 export default CartItem;
